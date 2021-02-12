@@ -4,18 +4,17 @@ var _require = require('apollo-server'),
     ApolloServer = _require.ApolloServer,
     PubSub = _require.PubSub;
 
-var mongoose = require('mongoose'); // 获取 MongoDB链接配置
-
-
-var _require2 = require('./config'),
-    MONGODB = _require2.MONGODB;
-
-var pubsub = new PubSub();
+var mongoose = require('mongoose');
 
 var typeDefs = require('./graphql/typeDefs');
 
 var resolvers = require('./graphql/resolvers');
 
+var _require2 = require('./config.js'),
+    MONGODB = _require2.MONGODB;
+
+var pubsub = new PubSub();
+var PORT = process.env.port || 5000;
 var server = new ApolloServer({
   typeDefs: typeDefs,
   resolvers: resolvers,
@@ -25,17 +24,17 @@ var server = new ApolloServer({
       req: req,
       pubsub: pubsub
     };
-  } //直接在 context访问request body
-
+  }
 });
 mongoose.connect(MONGODB, {
-  useUnifiedTopology: true,
   useNewUrlParser: true
 }).then(function () {
   console.log('MongoDB Connected');
   return server.listen({
-    port: 5000
+    port: PORT
   });
 }).then(function (res) {
-  console.log("Server runnning at ".concat(res.url));
+  console.log("Server running at ".concat(res.url));
+})["catch"](function (err) {
+  console.error(err);
 });
